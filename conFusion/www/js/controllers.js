@@ -41,8 +41,9 @@ angular.module('conFusion.controllers', [])
   };
 })
 
-  .controller('MenuController', ['$scope', 'menuFactory', function($scope, menuFactory) {
+  .controller('MenuController', ['$scope', 'menuFactory','baseURL', function($scope, menuFactory, baseURL) {
             
+            $scope.baseURL = baseURL;
             $scope.tab = 1;
             $scope.filtText = '';
             $scope.showDetails = false;
@@ -117,8 +118,9 @@ angular.module('conFusion.controllers', [])
             };
         }])
 
-        .controller('DishDetailController', ['$scope', '$stateParams', 'menuFactory', function($scope, $stateParams, menuFactory) {
+        .controller('DishDetailController', ['$scope', '$stateParams', 'menuFactory', 'baseURL',function($scope, $stateParams, menuFactory, baseURL) {
             
+            $scope.baseURL = baseURL;
             $scope.dish = {};
             $scope.showDish = false;
             $scope.message="Loading ...";
@@ -174,6 +176,8 @@ angular.module('conFusion.controllers', [])
                             }
                         );
 
+
+/*
                         $scope.promotion = 
                 {
                           _id:0,
@@ -183,9 +187,9 @@ angular.module('conFusion.controllers', [])
                           price:'19.99',
                           description:'Featuring mouthwatering combinations with a choice of five different salads, six enticing appetizers, six main entrees and five choicest desserts. Free flowing bubbly and soft drinks. All for just $19.99 per person ',
                 };
-                
+  */                 
                           
-                //        $scope.promotion = menuFactory.getPromotion().get({id:0});
+                        $scope.promotion = menuFactory.getPromotion().get({id:0});
                         
       }])
 
