@@ -12,7 +12,7 @@ angular.module('conFusion.controllers', [])
   // Form data for the login modal
   $scope.loginData = {};
   $scope.reservation = {};
-
+ 
   // Create the login modal that we will use later
   $ionicModal.fromTemplateUrl('templates/login.html', {
     scope: $scope
@@ -153,13 +153,30 @@ angular.module('conFusion.controllers', [])
             };
         }])
 
-        .controller('DishDetailController', ['$scope', '$stateParams', 'menuFactory', 'baseURL',function($scope, $stateParams, menuFactory, baseURL) {
+        .controller('DishDetailController', ['$scope', '$stateParams', 'menuFactory', 'favoriteFactory', 'baseURL',
+        '$ionicPopover', '$ionicModal', '$timeout', function($scope, $stateParams, menuFactory, favoriteFactory, baseURL, $ionicPopover, $ionicModal, $timeout) {
             
             $scope.baseURL = baseURL;
             $scope.dish = {};
             $scope.showDish = false;
             $scope.message="Loading ...";
+            $scope.comment= {};
             
+            $ionicPopover.fromTemplateUrl('templates/popover.html', {
+                scope: $scope
+            }).then(function(popover) {
+                $scope.popover = popover;
+            });
+
+            $scope.openPopover = function($event) {
+                $scope.popover.show($event);
+            };
+
+            $scope.closePopover = function () {
+                $scope.popover.hide();
+            };
+
+
             $scope.dish = menuFactory.getDishes().get({id:parseInt($stateParams.id,10)})
             .$promise.then(
                             function(response){
@@ -171,7 +188,39 @@ angular.module('conFusion.controllers', [])
                             }
             );
 
-            
+            $scope.addFavorite = function (index) {
+                 console.log("index is " + index);
+                 $scope.closePopover();
+                 console.log("test");
+                // favoriteFactory.addToFavorites(index);
+            };
+
+                        // Create the reserve modal that we will use later
+            $ionicModal.fromTemplateUrl('templates/addComment.html', {
+                scope: $scope
+            }).then(function(modal) {
+                $scope.commentform = modal;
+            });
+
+            // Triggered in the reserve modal to close it
+            $scope.closeComment = function() {
+                $scope.commentform.hide();
+            };
+
+            // Open the reserve modal
+            $scope.openComment = function() {
+                $scope.commentform.show();
+            };
+
+            // Perform the reserve action when the user submits the reserve form
+            $scope.addComment = function() {
+                console.log('Adding comment');
+
+                $timeout(function() {
+                $scope.closeComment();
+                }, 1000);
+            };    
+
         }])
 
         .controller('DishCommentController', ['$scope', 'menuFactory', function($scope,menuFactory) {
