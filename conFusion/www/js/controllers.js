@@ -176,7 +176,6 @@ angular.module('conFusion.controllers', [])
                 $scope.popover.hide();
             };
 
-
             $scope.dish = menuFactory.getDishes().get({id:parseInt($stateParams.id,10)})
             .$promise.then(
                             function(response){
@@ -188,11 +187,11 @@ angular.module('conFusion.controllers', [])
                             }
             );
 
+
             $scope.addFavorite = function (index) {
                  console.log("index is " + index);
                  $scope.closePopover();
-                 console.log("test");
-                // favoriteFactory.addToFavorites(index);
+                 favoriteFactory.addToFavorites(index);
             };
 
                         // Create the reserve modal that we will use later
@@ -215,9 +214,14 @@ angular.module('conFusion.controllers', [])
             // Perform the reserve action when the user submits the reserve form
             $scope.addComment = function() {
                 console.log('Adding comment');
-
+                
+                $scope.comment.date = new Date().toISOString();
+                $scope.dish.comments.push($scope.comment);       
+                menuFactory.getDishes().update({id:$scope.dish.id},$scope.dish);
+                
                 $timeout(function() {
                 $scope.closeComment();
+                $scope.closePopover();
                 }, 1000);
             };    
 
@@ -233,7 +237,7 @@ angular.module('conFusion.controllers', [])
                 console.log($scope.mycomment);
                 
                 $scope.dish.comments.push($scope.mycomment);
-        menuFactory.getDishes().update({id:$scope.dish.id},$scope.dish);
+               menuFactory.getDishes().update({id:$scope.dish.id},$scope.dish);
                 
                 $scope.commentForm.$setPristine();
                 
@@ -241,7 +245,6 @@ angular.module('conFusion.controllers', [])
             }
         }])
 
-        // implement the IndexController and About Controller here
 
           .controller('IndexController', ['$scope', 'menuFactory', 'corporateFactory', 'baseURL', function($scope, menuFactory, corporateFactory, baseURL) {
         
