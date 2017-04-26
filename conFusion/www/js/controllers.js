@@ -79,7 +79,7 @@ angular.module('conFusion.controllers', [])
             $scope.showMenu = false;
             $scope.message = "Loading ...";
             
-            menuFactory.getDishes().query(
+            menuFactory.query(
                 function(response) {
                     $scope.dishes = response;
                     $scope.showMenu = true;
@@ -153,8 +153,10 @@ angular.module('conFusion.controllers', [])
             };
         }])
 
-        .controller('DishDetailController', ['$scope', '$stateParams', 'menuFactory', 'favoriteFactory', 'baseURL',
-        '$ionicPopover', '$ionicModal', '$timeout', function($scope, $stateParams, menuFactory, favoriteFactory, baseURL, $ionicPopover, $ionicModal, $timeout) {
+        .controller('DishDetailController', ['$scope', '$stateParams','dish',
+        'menuFactory', 'favoriteFactory', 'baseURL','$ionicPopover', '$ionicModal',
+         '$timeout', function($scope, $stateParams, dish, menuFactory, favoriteFactory,
+          baseURL, $ionicPopover, $ionicModal, $timeout) {
             
             $scope.baseURL = baseURL;
             $scope.dish = {};
@@ -176,17 +178,7 @@ angular.module('conFusion.controllers', [])
                 $scope.popover.hide();
             };
 
-            $scope.dish = menuFactory.getDishes().get({id:parseInt($stateParams.id,10)})
-            .$promise.then(
-                            function(response){
-                                $scope.dish = response;
-                                $scope.showDish = true;
-                            },
-                            function(response) {
-                                $scope.message = "Error: "+response.status + " " + response.statusText;
-                            }
-            );
-
+            $scope.dish = dish;
 
             $scope.addFavorite = function (index) {
                  console.log("index is " + index);
@@ -217,7 +209,7 @@ angular.module('conFusion.controllers', [])
                 
                 $scope.comment.date = new Date().toISOString();
                 $scope.dish.comments.push($scope.comment);       
-                menuFactory.getDishes().update({id:$scope.dish.id},$scope.dish);
+                menuFactory.update({id:$scope.dish.id},$scope.dish);
                 
                 $timeout(function() {
                 $scope.closeComment();
@@ -226,6 +218,8 @@ angular.module('conFusion.controllers', [])
             };    
 
         }])
+
+
 
         .controller('DishCommentController', ['$scope', 'menuFactory', function($scope,menuFactory) {
             
@@ -237,7 +231,7 @@ angular.module('conFusion.controllers', [])
                 console.log($scope.mycomment);
                 
                 $scope.dish.comments.push($scope.mycomment);
-               menuFactory.getDishes().update({id:$scope.dish.id},$scope.dish);
+               menuFactory.update({id:$scope.dish.id},$scope.dish);
                 
                 $scope.commentForm.$setPristine();
                 
@@ -252,7 +246,7 @@ angular.module('conFusion.controllers', [])
                         $scope.leader = corporateFactory.get({id:3});
                         $scope.showDish = false;
                         $scope.message="Loading ..."
-                        $scope.dish = menuFactory.getDishes().get({id:0})
+                        $scope.dish = menuFactory.get({id:0})
                         .$promise.then(
                             function(response){
                                 $scope.dish = response;
@@ -263,20 +257,7 @@ angular.module('conFusion.controllers', [])
                             }
                         );
 
-
-/*
-                        $scope.promotion = 
-                {
-                          _id:0,
-                          name:'Weekend Grand Buffet', 
-                          image: 'images/buffet.png',
-                          label:'New',
-                          price:'19.99',
-                          description:'Featuring mouthwatering combinations with a choice of five different salads, six enticing appetizers, six main entrees and five choicest desserts. Free flowing bubbly and soft drinks. All for just $19.99 per person ',
-                };
-  */                 
-                          
-                        $scope.promotion = menuFactory.getPromotion().get({id:0});
+                        $scope.promotion = menuFactory.get({id:0});
                         
       }])
 
@@ -289,33 +270,17 @@ angular.module('conFusion.controllers', [])
 
 
 
-        .controller('FavoritesController', ['$scope', 'menuFactory', 'favoriteFactory', 'baseURL', '$ionicListDelegate', 
-        '$ionicPopup', '$ionicLoading', '$timeout',function ($scope, menuFactory, favoriteFactory, baseURL,
-         $ionicListDelegate, $ionicPopup, $ionicLoading, $timeout) {
+        .controller('FavoritesController', ['$scope', 'menuFactory','dishes', 'favorites',
+        'favoriteFactory', 'baseURL', '$ionicListDelegate', 
+        '$ionicPopup', '$ionicLoading', '$timeout',function ($scope, menuFactory, dishes, favorites,  
+         favoriteFactory, baseURL, $ionicListDelegate, $ionicPopup, $ionicLoading, $timeout) {
 
                 $scope.baseURL = baseURL;
                 $scope.shouldShowDelete = false;
-
-                $ionicLoading.show({
-                    template: '<ion-spinner></ion-spinner> Loading...'
-                });
-                
-                $scope.favorites = favoriteFactory.getFavorites();
-                $scope.dishes = menuFactory.getDishes().query(
-                    function (response) {
-                        $scope.dishes = response;
-                        $timeout(function () {
-                            $ionicLoading.hide();
-                        }, 1000);
-                    },
-                    function (response) {
-                        $scope.message = "Error: " + response.status + " " + response.statusText;
-                        $timeout(function () {
-                            $ionicLoading.hide();
-                        }, 1000);
-                    });
-                console.log($scope.dishes, $scope.favorites);
-
+  
+                $scope.favorites = favorites;
+                $scope.dishes = dishes;
+            
                 $scope.toggleDelete = function () {
                     $scope.shouldShowDelete = !$scope.shouldShowDelete;
                     console.log($scope.shouldShowDelete + "why?");
